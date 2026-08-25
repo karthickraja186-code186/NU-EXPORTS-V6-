@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0877bd">
+<title>NU EXPORTS</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f6f9;color:#26384a}
+.container{max-width:1000px;margin:auto;padding:15px}.header{background:linear-gradient(135deg,#0877bd,#08a8d8);color:#fff;text-align:center;padding:22px;border-radius:18px;margin-bottom:15px}
+.header h1{margin:0;font-size:30px}.header p{margin:6px 0}.dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px}
+.dashboard-box,.menu-btn{background:#fff;padding:15px 8px;text-align:center;border-radius:14px;box-shadow:0 2px 8px #d5dce2;cursor:pointer}
+.dashboard-box strong{display:block;font-size:27px;margin-top:5px}.dashboard-box.active{outline:3px solid #0877bd}
+.card{background:#fff;padding:18px;border-radius:16px;margin-bottom:15px;box-shadow:0 2px 9px #d5dce2}h2{margin-top:0;color:#31547c}
+label{display:block;font-weight:bold;margin-top:12px;margin-bottom:5px}input,select{width:100%;padding:13px;border:1px solid #cbd4dc;border-radius:9px;font-size:16px;background:#fff}
+button{border:0;border-radius:9px;padding:13px;font-size:15px;font-weight:bold;cursor:pointer}.buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+.save{background:#0877bd;color:#fff}.update{background:#159447;color:#fff}.clear,.back{background:#777;color:#fff}.menu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.menu-btn strong{display:block;font-size:28px;margin-bottom:6px}.back{margin-bottom:12px}.page{display:none}.page.active{display:block}.table-container{overflow-x:auto}
+table{width:100%;min-width:850px;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #ddd;text-align:left}th{background:#0877bd;color:#fff}
+.pending-text{color:#e49a00;font-weight:bold}.delivered-text{color:#159447;font-weight:bold}.action{color:#fff;padding:7px 9px;margin:2px;font-size:13px}
+.edit{background:#0877bd}.status{background:#159447}.delete{background:#d93636}.empty{text-align:center;color:#777;padding:20px}
+.report-box{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px}.report-item{background:#f3f6f9;padding:15px;border-radius:10px;text-align:center}
+.report-item strong{display:block;font-size:22px;margin-top:5px}.transport-item{display:flex;justify-content:space-between;align-items:center;padding:13px;border-bottom:1px solid #ddd}
+.transport-delete{background:#d93636;color:#fff;padding:7px 10px;font-size:13px}.folder{background:#f7faff;border:1px solid #d5e2ef;border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;box-shadow:0 2px 6px #d5dce2}
+.folder-title{font-size:18px;font-weight:bold;color:#0877bd}.small-btn{width:100%;margin-top:8px}.backup{background:#673ab7;color:#fff}.restore{background:#e67e22;color:#fff}
+@media(max-width:600px){.dashboard{grid-template-columns:repeat(3,1fr)}.dashboard-box{font-size:12px}.dashboard-box strong{font-size:22px}.header h1{font-size:25px}.buttons,.menu-grid,.report-box{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><h1>NU EXPORTS</h1><p>Transport & Parcel Management</p></div>
+
+<div id="mainPage" class="page active">
+<div class="dashboard">
+<div class="dashboard-box active" onclick="showMainFilter('all')">📦 Total Parcels<strong id="totalCount">0</strong></div>
+<div class="dashboard-box" onclick="showMainFilter('Pending')">⏳ Pending<strong id="pendingCount">0</strong></div>
+<div class="dashboard-box" onclick="openPage('deliveryPage')">✅ Delivery<strong id="deliveredCount">0</strong></div>
+</div>
+
+<div class="card"><h2>📂 Reports & Management</h2><div class="menu-grid">
+<button class="menu-btn" onclick="openPage('dailyPage')"><strong>📊</strong>Daily Delivery Report</button>
+<button class="menu-btn" onclick="openPage('transportReportPage')"><strong>🚚</strong>Transport-wise Report</button>
+<button class="menu-btn" onclick="openPage('folderPage')"><strong>📁</strong>Transport Folders</button>
+<button class="menu-btn" onclick="openPage('transportPage')"><strong>🚚</strong>Transport Names</button>
+<button class="menu-btn" onclick="openPage('deliveryPage')"><strong>✅</strong>Delivery Parcels</button>
+</div></div>
+
+<div class="card"><h2>📦 Parcel Details</h2>
+<label>LR Number *</label><input id="lrNumber" type="text" placeholder="Enter LR Number">
+<label>Transport Name *</label><input id="transportName" list="transportOptions" placeholder="Select Transport Name"><datalist id="transportOptions"></datalist>
+<label>Number of Articles *</label><input id="articles" type="number" min="1" placeholder="Enter Articles">
+<label>Freight Amount</label><input id="freight" type="number" min="0" placeholder="₹ 0">
+<label>Local Freight Amount</label><input id="localFreight" type="number" min="0" placeholder="₹ 0">
+<label>Booking Date</label><input id="bookingDate" type="date">
+<label>Delivery Date</label><input id="deliveryDate" type="date">
+<label>Delivery Status</label><select id="deliveryStatus"><option value="Pending">Pending</option><option value="Delivered">Delivered</option></select>
+<div class="buttons"><button class="save" onclick="saveParcel()">💾 SAVE</button><button class="update" onclick="updateParcel()">✏️ UPDATE</button><button class="clear" onclick="clearForm()">🧹 CLEAR</button></div>
+</div>
+
+<div class="card"><h2>🔎 Search</h2><input id="searchBox" type="text" placeholder="Search LR Number / Transport" oninput="displayParcels()"></div>
+<div class="card"><h2 id="listTitle">📋 All Parcels</h2><div class="table-container"><table><thead><tr><th>LR Number</th><th>Transport</th><th>Articles</th><th>Freight</th><th>Local Freight</th><th>Booking Date</th><th>Delivery Date</th><th>Status</th><th>Action</th></tr></thead><tbody id="parcelTable"></tbody></table></div><div id="emptyMessage" class="empty" style="display:none">No parcels found.</div></div>
+
+<div class="card"><h2>💾 Data Backup & Recovery</h2>
+<button class="backup small-btn" onclick="backupData()">⬇️ Backup Data</button>
+<button class="restore small-btn" onclick="document.getElementById('restoreFile').click()">⬆️ Restore Data</button>
+<input id="restoreFile" type="file" accept=".json" style="display:none" onchange="restoreData(event)">
+</div>
+</div>
+
+<div id="dailyPage" class="page"><div class="card"><button class="back" onclick="openPage('mainPage')">← Back</button><h2>📊 Daily Delivery Report</h2><label>Select Delivery Date</label><input id="dailyDate" type="date" onchange="renderDailyReport()"></div>
+<div class="card"><div class="report-box"><div class="report-item">📦 Parcels<strong id="dailyParcelCount">0</strong></div><div class="report-item">📦 Articles<strong id="dailyArticleCount">0</strong></div><div class="report-item">💰 Freight<strong id="dailyFreight">₹0</strong></div><div class="report-item">💰 Local Freight<strong id="dailyLocalFreight">₹0</strong></div><div class="report-item">💵 Total<strong id="dailyGrandTotal">₹0</strong></div></div>
+<div class="table-container"><table><thead><tr><th>LR Number</th><th>Transport</th><th>Articles</th><th>Freight</th><th>Local Freight</th><th>Delivery Date</th></tr></thead><tbody id="dailyTable"></tbody></table></div><div id="dailyEmpty" class="empty" style="display:none">No delivery parcels for this date.</div></div></div>
+
+<div id="transportReportPage" class="page"><div class="card"><button class="back" onclick="openPage('mainPage')">← Back</button><h2>🚚 Transport-wise Report</h2><label>Select Transport</label><select id="reportTransport" onchange="renderTransportReport()"><option value="">Select Transport</option></select></div>
+<div class="card"><div class="report-box"><div class="report-item">📦 Parcels<strong id="transportParcelCount">0</strong></div><div class="report-item">⏳ Pending<strong id="transportPending">0</strong></div><div class="report-item">✅ Delivered<strong id="transportDelivered">0</strong></div><div class="report-item">💰 Freight<strong id="transportFreight">₹0</strong></div><div class="report-item">💰 Local Freight<strong id="transportLocal">₹0</strong></div></div>
+<div class="table-container"><table><thead><tr><th>LR Number</th><th>Articles</th><th>Freight</th><th>Local Freight</th><th>Status</th></tr></thead><tbody id="transportReportTable"></tbody></table></div></div></div>
+
+<div id="transportPage" class="page"><div class="card"><button class="back" onclick="openPage('mainPage')">← Back</button><h2>📁 Transport Names</h2><input id="newTransport" placeholder="Enter Transport Name"><button class="save small-btn" onclick="addTransport()">＋ Add Transport</button></div><div class="card"><div id="transportList"></div></div></div>
+
+<div id="deliveryPage" class="page"><div class="card"><button class="back" onclick="openPage('mainPage')">← Back</button><h2>✅ Delivery Parcels</h2><p>Delivered parcels only.</p><div class="table-container"><table><thead><tr><th>LR Number</th><th>Transport</th><th>Articles</th><th>Freight</th><th>Local Freight</th><th>Delivery Date</th></tr></thead><tbody id="deliveryTable"></tbody></table></div><div id="deliveryEmpty" class="empty" style="display:none">No delivered parcels found.</div></div></div>
+
+<div id="folderPage" class="page"><div class="card"><button class="back" onclick="openPage('mainPage')">← Back</button><h2>🚚 Transport Folders</h2><div id="folderList"></div></div></div>
+</div>
+
+<script>
+let parcels=JSON.parse(localStorage.getItem("NU_EXPORTS_DATA")||"[]");
+let transports=JSON.parse(localStorage.getItem("NU_EXPORTS_TRANSPORTS")||"[]");
+let editingId=null,currentFilter="all";
+const saveData=()=>localStorage.setItem("NU_EXPORTS_DATA",JSON.stringify(parcels));
+const saveTransports=()=>localStorage.setItem("NU_EXPORTS_TRANSPORTS",JSON.stringify(transports));
+function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+function openPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.getElementById(id).classList.add("active");window.scrollTo({top:0,behavior:"smooth"});if(id==="dailyPage")renderDailyReport();if(id==="transportPage")renderTransportList();if(id==="transportReportPage"){renderReportOptions();renderTransportReport();}if(id==="deliveryPage")renderDeliveryPage();if(id==="folderPage")renderFolders();}
+function readForm(){let lr=lrNumber.value.trim(),transport=transportName.value.trim(),a=document.getElementById("articles").value;if(!lr||!transport||!a){alert("Please fill LR Number, Transport Name and Articles");return null}return {lrNumber:lr,transportName:transport,articles:Number(a),freight:Number(freight.value||0),localFreight:Number(localFreight.value||0),bookingDate:bookingDate.value,deliveryDate:deliveryDate.value,status:deliveryStatus.value};}
+function duplicateLR(lr,ignore=null){return parcels.some(p=>String(p.lrNumber).trim().toLowerCase()===lr.trim().toLowerCase()&&p.id!==ignore)}
+function saveParcel(){let p=readForm();if(!p)return;if(duplicateLR(p.lrNumber)){alert("⚠️ LR Number already exists!");return}p.id=Date.now();parcels.push(p);autoTransport(p.transportName);saveData();clearForm();displayParcels();alert("✅ Parcel Saved Successfully!")}
+function autoTransport(n){if(!transports.some(x=>x.toLowerCase()===n.toLowerCase())){transports.push(n);transports.sort();saveTransports()}renderTransportOptions();renderTransportList()}
+function editParcel(id){let p=parcels.find(x=>x.id===id);if(!p)return;editingId=id;lrNumber.value=p.lrNumber;transportName.value=p.transportName;articles.value=p.articles;freight.value=p.freight;localFreight.value=p.localFreight;bookingDate.value=p.bookingDate;deliveryDate.value=p.deliveryDate;deliveryStatus.value=p.status;window.scrollTo({top:0,behavior:"smooth"})}
+function updateParcel(){if(editingId===null){alert("First click Edit button");return}let p=readForm();if(!p)return;if(duplicateLR(p.lrNumber,editingId)){alert("⚠️ LR Number already exists!");return}let i=parcels.findIndex(x=>x.id===editingId);if(i<0)return;parcels[i]={...parcels[i],...p};autoTransport(p.transportName);saveData();clearForm();displayParcels();alert("✅ Parcel Updated Successfully!")}
+function clearForm(){["lrNumber","transportName","articles","freight","localFreight","bookingDate","deliveryDate"].forEach(id=>document.getElementById(id).value="");deliveryStatus.value="Pending";editingId=null}
+function changeStatus(id){let p=parcels.find(x=>x.id===id);if(!p)return;p.status=p.status==="Pending"?"Delivered":"Pending";if(p.status==="Delivered"&&!p.deliveryDate)p.deliveryDate=new Date().toISOString().split("T")[0];saveData();displayParcels()}
+function deleteParcel(id){if(!confirm("Delete this parcel?"))return;parcels=parcels.filter(x=>x.id!==id);saveData();displayParcels()}
+function showMainFilter(f){currentFilter=f;displayParcels()}
+function displayParcels(){let s=searchBox.value.toLowerCase().trim();let data=parcels.filter(p=>(String(p.lrNumber).toLowerCase().includes(s)||String(p.transportName).toLowerCase().includes(s))&&(currentFilter==="all"||p.status===currentFilter));parcelTable.innerHTML=data.map(p=>`<tr><td>${safe(p.lrNumber)}</td><td>${safe(p.transportName)}</td><td>${p.articles}</td><td>₹${p.freight}</td><td>₹${p.localFreight}</td><td>${p.bookingDate||"-"}</td><td>${p.deliveryDate||"-"}</td><td class="${p.status==="Pending"?"pending-text":"delivered-text"}">${p.status}</td><td><button class="action edit" onclick="editParcel(${p.id})">Edit</button><button class="action status" onclick="changeStatus(${p.id})">${p.status==="Pending"?"Delivered":"Pending"}</button><button class="action delete" onclick="deleteParcel(${p.id})">Delete</button></td></tr>`).join("");emptyMessage.style.display=data.length?"none":"block";listTitle.innerText=currentFilter==="Pending"?"⏳ Pending Parcels":"📋 All Parcels";updateDashboard()}
+function updateDashboard(){totalCount.innerText=parcels.length;pendingCount.innerText=parcels.filter(p=>p.status==="Pending").length;deliveredCount.innerText=parcels.filter(p=>p.status==="Delivered").length}
+function renderTransportOptions(){transportOptions.innerHTML=transports.map(n=>`<option value="${safe(n)}">`).join("")}
+function renderTransportList(){transportList.innerHTML=transports.length?transports.map(n=>`<div class="transport-item"><span>🚚 ${safe(n)}</span><button class="transport-delete" onclick="deleteTransport(${JSON.stringify(n)})">Delete</button></div>`).join(""):'<div class="empty">No transport names.</div>'}
+function addTransport(){let n=newTransport.value.trim();if(!n){alert("Enter Transport Name");return}if(transports.some(x=>x.toLowerCase()===n.toLowerCase())){alert("⚠️ Transport already exists!");return}transports.push(n);transports.sort();saveTransports();newTransport.value="";renderTransportList();renderTransportOptions();alert("✅ Transport Added!")}
+function deleteTransport(n){if(!confirm("Delete "+n+"?"))return;transports=transports.filter(x=>x!==n);saveTransports();renderTransportList();renderTransportOptions()}
+function renderDailyReport(){let d=dailyDate.value,r=parcels.filter(p=>p.status==="Delivered"&&(!d||p.deliveryDate===d)),f=r.reduce((a,p)=>a+Number(p.freight||0),0),l=r.reduce((a,p)=>a+Number(p.localFreight||0),0);dailyParcelCount.innerText=r.length;dailyArticleCount.innerText=r.reduce((a,p)=>a+Number(p.articles||0),0);dailyFreight.innerText="₹"+f.toLocaleString("en-IN");dailyLocalFreight.innerText="₹"+l.toLocaleString("en-IN");dailyGrandTotal.innerText="₹"+(f+l).toLocaleString("en-IN");dailyTable.innerHTML=r.map(p=>`<tr><td>${safe(p.lrNumber)}</td><td>${safe(p.transportName)}</td><td>${p.articles}</td><td>₹${p.freight}</td><td>₹${p.localFreight}</td><td>${p.deliveryDate||"-"}</td></tr>`).join("");dailyEmpty.style.display=r.length?"none":"block"}
+function renderReportOptions(){reportTransport.innerHTML='<option value="">Select Transport</option>'+transports.map(n=>`<option value="${safe(n)}">${safe(n)}</option>`).join("")}
+function renderTransportReport(){let n=reportTransport.value,r=n?parcels.filter(p=>p.transportName===n):[];let f=r.reduce((a,p)=>a+Number(p.freight||0),0),l=r.reduce((a,p)=>a+Number(p.localFreight||0),0);transportParcelCount.innerText=r.length;transportPending.innerText=r.filter(p=>p.status==="Pending").length;transportDelivered.innerText=r.filter(p=>p.status==="Delivered").length;transportFreight.innerText="₹"+f.toLocaleString("en-IN");transportLocal.innerText="₹"+l.toLocaleString("en-IN");transportReportTable.innerHTML=r.map(p=>`<tr><td>${safe(p.lrNumber)}</td><td>${p.articles}</td><td>₹${p.freight}</td><td>₹${p.localFreight}</td><td class="${p.status==="Delivered"?"delivered-text":"pending-text"}">${p.status}</td></tr>`).join("")}
+function renderDeliveryPage(){let r=parcels.filter(p=>p.status==="Delivered");deliveryTable.innerHTML=r.map(p=>`<tr><td>${safe(p.lrNumber)}</td><td>${safe(p.transportName)}</td><td>${p.articles}</td><td>₹${p.freight}</td><td>₹${p.localFreight}</td><td>${p.deliveryDate||"-"}</td></tr>`).join("");deliveryEmpty.style.display=r.length?"none":"block"}
+function renderFolders(){folderList.innerHTML=transports.length?transports.map(n=>{let r=parcels.filter(p=>p.transportName.toLowerCase()===n.toLowerCase());return `<div class="folder" onclick="openFolder(${JSON.stringify(n)})"><div class="folder-title">📁 ${safe(n)}</div><div>📦 Total: ${r.length} &nbsp; ⏳ Pending: ${r.filter(p=>p.status==="Pending").length} &nbsp; ✅ Delivered: ${r.filter(p=>p.status==="Delivered").length}</div></div>`}).join(""):'<div class="empty">No transport names added.</div>'}
+function openFolder(n){let r=parcels.filter(p=>p.transportName.toLowerCase()===n.toLowerCase()),f=r.reduce((a,p)=>a+Number(p.freight||0),0),l=r.reduce((a,p)=>a+Number(p.localFreight||0),0);folderList.innerHTML=`<button class="back" onclick="renderFolders()">← Transport List</button><h2>📁 ${safe(n)}</h2><p>📦 Total Parcels: <b>${r.length}</b></p><p>💰 Total Freight: <b>₹${f.toLocaleString("en-IN")}</b></p><p>🚚 Total Local Freight: <b>₹${l.toLocaleString("en-IN")}</b></p><div class="table-container"><table><thead><tr><th>LR</th><th>Articles</th><th>Freight</th><th>Local</th><th>Booking</th><th>Delivery</th><th>Status</th></tr></thead><tbody>${r.map(p=>`<tr><td>${safe(p.lrNumber)}</td><td>${p.articles}</td><td>₹${p.freight}</td><td>₹${p.localFreight}</td><td>${p.bookingDate||"-"}</td><td>${p.deliveryDate||"-"}</td><td class="${p.status==="Delivered"?"delivered-text":"pending-text"}">${p.status}</td></tr>`).join("")}</tbody></table></div>`}
+function backupData(){let data=JSON.stringify({parcels,transports},null,2),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type:"application/json"}));a.download="NU_EXPORTS_Backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function restoreData(e){let file=e.target.files[0];if(!file)return;let reader=new FileReader();reader.onload=()=>{try{let d=JSON.parse(reader.result);if(!Array.isArray(d.parcels)||!Array.isArray(d.transports))throw new Error();parcels=d.parcels;transports=d.transports;saveData();saveTransports();renderTransportOptions();renderTransportList();displayParcels();alert("✅ Data Restored Successfully!")}catch(err){alert("❌ Invalid backup file")}e.target.value=""};reader.readAsText(file)}
+renderTransportOptions();renderTransportList();displayParcels();
+</script>
+</body>
+</html>
